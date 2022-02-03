@@ -25,18 +25,21 @@
         this.width = width;
         this.height = height;
         this.board = board;
-
         this.board.bars.push(this);//Se pasan las barras al mismo elemento board
-
         this.kind = "rectangle";//Si es circulo o cuadrado la barra a pintar
+        this.speed = 10; // Velocidad con lo que se mueven las barras
     }
 
     self.Bar.prototype = {
-        down: function(){//Funciones para dibujar cuando la barra baja
-
+        down: function(){//Funciones para mover la barra hacia abajo
+            this.y += this.speed;//Mueve la barra a la velocidad establecida
         },
-        up: function(){//Funciones para dibujar cuando la barra sube
-
+        up: function(){//Funciones para mover la barra hacia arriba
+            this.y -= this.speed;//Mueve la barra a la velocidad establecida
+        },
+        toString: function(){//Se sobrecarga el método toString para que imprima las
+            //coordenadas
+            return "x: " + this.x + " y: " + this.y;
         }
     }
 })();
@@ -70,13 +73,37 @@
     }
 })();
 
+//Se colocan aquí las variables para que todas las clases tengan acceso a ellas
+var board = new Board(800,400);
+var bar = new Bar(20,100,40,100,board);
+var bar = new Bar(735,100,40,100,board);
+var canvas = document.getElementById('canvas');
+var board_view = new BoardView(canvas, board);
+
+document.addEventListener("keydown",function(ev){
+    //console.log(ev.keyCode);// Para ver el código que recibe el teclado
+
+    if(ev.keyCode == 38){//Se presionó la tecla hacia arriba
+        bar.up();
+    }else if(ev.keyCode == 40){
+        bar.down();
+    }
+
+    //Se imprime en consola la posición de las barras
+    console.log(""+bar);
+})//Se accede al DOM mismo para mover las barras
+
 window.addEventListener("load",main)//Esta línea va a cambiar con el tiempo
 
 function main(){//Función que va a correr el juego
+    /*
+    //Para que funcione, se mueven estas líneas de código al EventListener del DOM
+    //Se puede mejorar pero en el video de práctica se decide hacerlo así
     var board = new Board(800,400);
     var bar = new Bar(20,100,40,100,board);
     var bar = new Bar(735,100,40,100,board);
     var canvas = document.getElementById('canvas');
     var board_view = new BoardView(canvas, board);
-    board_view.draw();
+    */
+    board_view.draw();//Se dibuja solo una vez
 }
