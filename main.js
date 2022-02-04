@@ -2,16 +2,19 @@
     self.Board = function(width, height){
         this.width = width;
         this.height = height;
-        this.plating = false;
+        this.playing = false;
         this.game_over = false;
         this.bars = [];
         this.ball = null;
+        
     }
 
     self.Board.prototype = {
         get elements(){//Método para obtener los elementos, debe de sobreescribirse
             //al de la clase canvas
-            var elements = this.bars;
+            var elements = this.bars.map(function(bar){//Se decide pasar una copia del arreglo
+                return bar;//No pasar por referencia, recolector de basura no puede con él
+            });
             //elements.push(this.ball); //Para que no se tarde mucho en hacer la animación
             elements.push(this.ball);
             return elements;
@@ -29,6 +32,15 @@
         this.speed_x = 3;
         board.ball = this;
         this.kind = "circle";
+        this.direction = 1;
+
+        
+    }
+    self.Ball.prototype = {
+        move: function(){
+            this.x += this.speed_x * this.direction;
+            this.y += this.speed_y;
+        }
     }
 })();
 
@@ -77,8 +89,17 @@
             };
         },
         play: function(){
-            board_view.clean();
-            board_view.draw();
+            if(this.board.playing){//Se mueve la bola solo si está en juego
+                this.clean();
+                this.draw();
+                this.board.ball.move();
+            }
+            /*
+            this.clean();
+            this.draw();
+            this.board.ball.move();
+            */
+
         }
     }
 
@@ -121,15 +142,22 @@ requestAnimationFrame(controller);//Esta linea es para que se vea la animación 
 document.addEventListener("keydown",function(ev){
     //console.log(ev.keyCode);// Para ver el código que recibe el teclado
 
-    ev.preventDefault();//Para evitar que la página baje en el navegador
+    //ev.preventDefault();//Para evitar que la página baje en el navegador
     if(ev.keyCode == 38){//Se presionó la tecla hacia arriba
+        ev.preventDefault();
         bar.up();
     }else if(ev.keyCode == 40){//Se presionó la tecla hacia arbajo
+        ev.preventDefault();
         bar.down();
     }else if(ev.keyCode == 87){//Se presionó la tecla 'w'
+        ev.preventDefault();
         bar_2.up();
     }else if(ev.keyCode == 83){//Se presionó la tecla 's'
+        ev.preventDefault();
         bar_2.down();
+    }else if(ev.keyCode == 32){//Se presionó la tecla ' ' -> Espaciadora
+        ev.preventDefault();
+        board.playing = !board.playing;
     }
 
     //Se imprime en consola la posición de las barras
@@ -137,6 +165,8 @@ document.addEventListener("keydown",function(ev){
     //console.log(""+bar_2);
 })//Se accede al DOM mismo para mover las barras
 
+board_view.draw();//Se le instruye al board_view que se muestre una vez para no
+//mostrar la página en blanco
 window.addEventListener("load",controller)//Esta línea va a cambiar con el tiempo
 
 function controller(){//Función que va a correr el juego
